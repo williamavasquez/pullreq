@@ -1,43 +1,51 @@
-const githubApi = require('./config'); 
+const axios = require('axios');
 
-// const axios = require ('axios')
+//config file
+const { GITAPIKEY } = require('./config');
+let  data = '';
 
 
 
-
-// axios.get( `https://api.github.com/repos/jeffreyyourman/TournamentOrganizer/pulls?access_token=${githubApi}`)
-//     .then(res => {
-//         console.log(res.data[0].url)
-//     })
-
-var data = '';
 function withPipe(data) {
-    console.log('content was piped');
-    console.log(data.trim());
+  let pullReqUrl = data.trim()
+  let url = `https://api.github.com/repos/jeffreyyourman/TournamentOrganizer/pulls?access_token=${GITAPIKEY}`
+
+	axios
+		.get(url, {
+      'base': pullReqUrl
+    })
+		.then(res => {
+			console.log(res.data[0].html_url);
+      pbcopy(res.data[0].html_url)
+		});
 }
+
 function withoutPipe() {
-    console.log('no content was piped');
+	// console.log('no content was piped');
+}
+
+function pbcopy(data) {
+  var proc = require('child_process').spawn('pbcopy');
+  proc.stdin.write(data); proc.stdin.end();
 }
 
 var self = process.stdin;
 
 if (process.stdin.isTTY) {
-    // handle shell arguments
-    var argymen = process.argv
-    console.log(argymen)
+	//add value
+  console.log('nothing')
+} else {
+	self.on('readable', function() {
+		var chunk = this.read();
+		if (chunk === null) {
+			withoutPipe();
+		} else {
+			data += chunk;
+		}
+	});
 
-    self.on('readable', function() {
-        var chunk = this.read();
-        if (chunk === null) {
-            withoutPipe();
-        } else {
-            data += chunk;
-        }
-    });
-
-  } else {
-    // handle piped content (see Jerome’s answer)
-    self.on('end', function() {
-        withPipe(data);
-    });
-}  
+	// handle piped content (see Jerome’s answer)
+	self.on('end', function() {
+		withPipe(data);
+	});
+}
