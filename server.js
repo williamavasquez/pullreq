@@ -8,15 +8,17 @@ let  data = '';
 
 function withPipe(data) {
   let pullReqUrl = data.trim()
-  let url = `https://api.github.com/repos/jeffreyyourman/TournamentOrganizer/pulls?access_token=${GITAPIKEY}`
+  let url = `https://api.github.com/repos/jeffreyyourman/TournamentOrganizer/pulls`
 
+  console.log("here is the branch", pullReqUrl)
 	axios
 		.get(url, {
-      'base': pullReqUrl
+      access_token: GITAPIKEY,
+      base: pullReqUrl
     })
 		.then(res => {
-			console.log(res.data[0].html_url);
-      pbcopy(res.data[0].html_url)
+			console.log(res.data);
+      // pbcopy(res.data[0].html_url)
 		});
 }
 
