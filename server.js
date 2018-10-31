@@ -1,5 +1,5 @@
 const axios = require('axios');
-
+const opn = require('opn')
 //config file
 const { GITAPIKEY } = require('./config');
 let  data = '';
@@ -8,17 +8,25 @@ let  data = '';
 
 function withPipe(data) {
   let pullReqUrl = data.trim()
-  let url = `https://api.github.com/repos/jeffreyyourman/TournamentOrganizer/pulls`
 
-  console.log("here is the branch", pullReqUrl)
+  // if(pullReqUrl === "master"){
+  //   console.log("There are no pull request on master")
+  //   return
+  // }
+
+  // let url = `https://api.github.com/repos/jeffreyyourman/TournamentOrganizer/pulls?head=jeffreyyourman:${pullReqUrl}`
+  let url = `https://api.github.com/repos/jeffreyyourman/TournamentOrganizer/pulls?head=jeffreyyourman:onemore`
+
 	axios
 		.get(url, {
       access_token: GITAPIKEY,
-      base: pullReqUrl
     })
 		.then(res => {
-			console.log(res.data);
-      // pbcopy(res.data[0].html_url)
+      opn(res.data[0].html_url, {app: ['google chrome']});
+      console.log("Link has been copied to clipboard",res.data[0].html_url)
+      console.log("current State of PR:", res.data[0].state)
+      pbcopy(res.data[0].html_url)
+      process.exit()
 		});
 }
 
